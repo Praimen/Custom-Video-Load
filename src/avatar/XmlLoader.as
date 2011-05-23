@@ -9,12 +9,12 @@ package avatar
 		
 		private var _xmlResult:XML;
 		private var myLoader:URLLoader = new URLLoader();
-		private var videoBase:VideoTest;
 		
-		public function XmlLoader(xmlfile:String,videoElement:VideoTest){
+		
+		public function XmlLoader(xmlfile:String){
 			myLoader.addEventListener(Event.COMPLETE, processXML);
 			myLoader.load(new URLRequest(xmlfile));	
-			this.videoBase = videoElement;			
+					
 		}
 	
 		
@@ -29,7 +29,7 @@ package avatar
 			var myXML:XML = new XML(e.target.data);
 			try{
 				if(myXML != null){						
-					videoBase.setXML(myXML);
+					//videoBase.setXML(myXML);
 				}
 			}catch(e:Error){
 				trace("XML load Failed");

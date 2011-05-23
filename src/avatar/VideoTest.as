@@ -61,7 +61,7 @@ package avatar
 			//attempts to load the XML
 			if(path != null){
 				try{					
-					var xmlLoad:XmlLoader = new XmlLoader(path + xmlFile, this);
+					//var xmlLoad:XmlLoader = new XmlLoader(path + xmlFile, this);
 					
 				}catch(e:Error){ trace("error occurred while requesting the XML file"); }
 			}					

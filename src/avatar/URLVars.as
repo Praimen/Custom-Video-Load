@@ -9,25 +9,25 @@ package avatar
 		private var _flashVars:Object;
 		private var _myXML:XML
 		private var xmlLoad:XmlLoader;
-		private var myLoader:URLLoader = new URLLoader();			
+		private var myLoader:URLLoader = new URLLoader();	
 		
-		private var videoBase:VideoTest;
-		
-		public function URLVars(videoElement:VideoTest){
+		public function URLVars(){
 			_flashVars = new Object();			
 			loaderInfo.addEventListener(Event.COMPLETE, loaderComplete);	
-			this.videoBase = videoElement;
+			
 		}
 		
 		
 		private function loaderComplete(evt:Event):void{
 			
-			_flashVars = LoaderInfo(this.root.loaderInfo).parameters;			
-			//videoBase.getFlashVars(_flashVars);			
+			_flashVars = LoaderInfo(this.root.loaderInfo).parameters;					
 			
 		}
 		
-		
+		public function get flashVars():Object{	
+			
+			return _flashVars;
+		}
 		
 		
 		
