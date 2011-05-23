@@ -1,5 +1,5 @@
 package avatar
-{
+{	
 	import flash.display.Sprite;
 	import flash.events.*;
 	import flash.net.*;
@@ -8,39 +8,39 @@ package avatar
 	{
 		
 		private var _xmlResult:XML;
-		private var myLoader:URLLoader = new URLLoader();
-		
+		private var myLoader:URLLoader = new URLLoader();		
 		
 		public function XmlLoader(xmlfile:String){
 			myLoader.addEventListener(Event.COMPLETE, processXML);
-			myLoader.load(new URLRequest(xmlfile));	
-					
+			myLoader.addEventListener(IOErrorEvent.IO_ERROR, xmlLoadError);
+			myLoader.load(new URLRequest(xmlfile));						
 		}
-	
 		
 		/*====================== Process XML ==============================	
 		processXML is called by the myLoader URL Request and
 		will populate the myXML object 
-		check to see if the object is null
-		and then call the playVideo() to start
-		to start building the video	*/
+		check to see if the object is null*/		
 		
 		private function processXML(e:Event):void {
 			var myXML:XML = new XML(e.target.data);
 			try{
-				if(myXML != null){						
-					//videoBase.setXML(myXML);
+				if(myXML != null){
+					_xmlResult = myXML;
+					GlobalDispatcher.GetInstance().dispatchEvent(new GlobalEvent(GlobalEvent.XML_LOADED));					
 				}
 			}catch(e:Error){
 				trace("XML load Failed");
-			}
-			
+			}			
 		}
 		
+		private function xmlLoadError(e:IOErrorEvent):void {			
+			trace("there was an error requesting the XML file: "+ e.text)			
+		}			
+		
 		//*********************************************************************
+		public function get xmlFile():XML{			
+			return _xmlResult;
+		}		
 		
-		
-		
-		
-	}
-}
+	}//end Class
+}//end Package

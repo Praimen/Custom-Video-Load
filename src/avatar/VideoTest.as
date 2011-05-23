@@ -2,15 +2,12 @@ package avatar
 {
 	import com.greensock.*;
 	import com.greensock.easing.*;
-	import com.greensock.plugins.*;
-	
+	import com.greensock.plugins.*;	
 	import flash.display.*;
 	import flash.events.*;
 	import flash.media.*;
 	import flash.net.*;
-	import flash.text.*;
-	
-	
+	import flash.text.*;	
 
 	[SWF(backgroundColor="#666666", frameRate="100", width="350", height="450")]
 	public class VideoTest extends Sprite
@@ -35,71 +32,58 @@ package avatar
 		private var videoContainer:Sprite = new Sprite();
 		private var flashVars:Object = new Object();
 		private var videoXML:XML = new XML();
-		
-		private var urlVar:URLVars
+		private var xmlLoad:XmlLoader;
+		private var urlVar:URLVars;
 		private var myTween:TweenLite; 
 		//private var videoContainer:
 		
-		public function VideoTest()	{				
+		public function VideoTest()	{	
 			
-			loaderInfo.addEventListener(Event.COMPLETE, loaderComplete); //uncomment for live run
-			
+			urlVar = new URLVars();	
+			loaderInfo.addEventListener(Event.COMPLETE, urlVar.loaderComplete);
+			//loaderInfo.addEventListener(Event.COMPLETE, loaderComplete); //uncomment for live run			
+			GlobalDispatcher.GetInstance().addEventListener(GlobalEvent.FLASHVARS_LOADED, getFlashVars);
+			GlobalDispatcher.GetInstance().addEventListener(GlobalEvent.XML_LOADED, getXML);
 			//initText();//uncomment for local testing
 		}
 		
-		private function loaderComplete(evt:Event):void{
+		private function getFlashVars(evt:GlobalEvent):void{
 			//load Flash Variables from page
-			flashVars = LoaderInfo(this.root.loaderInfo).parameters;	
+			this.flashVars = urlVar.flashVars;
 			path = flashVars["skinPath"];
 			xmlFile = flashVars["xmlFile"];
 			pageName = flashVars["pageName"];
-			getXML();
-		}					
-	
+				if(path != null){//check to make sure there is a valid path
+					xmlLoad = new XmlLoader(path + xmlFile);
+				}else{
+					trace("invalid path or path not specified");
+				}
+		}		
 		
-		public function getXML():void{
-			//attempts to load the XML
-			if(path != null){
-				try{					
-					//var xmlLoad:XmlLoader = new XmlLoader(path + xmlFile, this);
-					
-				}catch(e:Error){ trace("error occurred while requesting the XML file"); }
-			}					
-		}
-		
-		public function setXML(xml:XML):void{
-			
-			//********* 
-			//this most like needs to be put into a class that dispatches an event that will 
-			//then trigger a get function from the class, then set the loaded XML 
-			//and finally perform the needed validation check on the XML node requests
-			//**********
+		private function getXML(evt:GlobalEvent):void{			
 			//set the XML
-			videoXML = xml;
+			videoXML = xmlLoad.xmlFile;
 			
 				if(videoXML != null){
-					//attempts validate the node request, if it is not valid the Video will be Stopped
+					//attempts validate the node request, if it is not valid the Video process will be stopped
 					//trace("THIS IS THE VIDEO XML RESULT: "+videoXML.VIDEO.(@TITLE==pageName));
 					if(videoXML.VIDEO.(@TITLE==pageName) == "" || videoXML.VIDEO.(@TITLE==pageName) == null || videoXML.VIDEO.(@TITLE==pageName) == undefined  ){
 						stopVideo();						
 					}else{
 						initText();
 					}
-				}else{ trace("error: improperly formatted node request or node not found in XML tree");	}			
-		}
-		
+				}else{ trace("error: improperly formatted node request or node not found in XML tree");	}	
+				
+		}	
 		
 		
 		private function initText():void{
 			//initiallizes the status Report Text and embeds the font
 			var embFonts:EmbedFonts = new EmbedFonts(20);
 			var newTextFormat:TextFormat = embFonts.format;
+			statusTxt.defaultTextFormat = newTextFormat;	
 			
-			statusTxt.antiAliasType = AntiAliasType.ADVANCED;
-			statusTxt.defaultTextFormat = newTextFormat;
-			//statusTxt.background = true;
-			//statusTxt.backgroundColor = 0x000000;
-			//statusTxt.multiline = true;
+			statusTxt.antiAliasType = AntiAliasType.ADVANCED;				
 			statusTxt.autoSize = TextFieldAutoSize.CENTER;
 			statusMessage = "Loading Assistant";
 			statusTxt.textColor = 0xFFFFFF;
@@ -233,35 +217,33 @@ package avatar
 			var bufferLoaded:uint = (ns.bytesLoaded/bufferMark ) * 100; //used to see a percentage value of the buffer load
 			//if the percentage of video bytes loaded is pass the start bytes value and the video is paused on it's inital run
 			//then the video will start to play
-			if (videoLoadedPercent > pecentStartPlaying && !vidPlaying  && vidInit){
-				trace("resumed");
-				//removeEventListener(Event.ENTER_FRAME, onEnterFrame);
-				vidPlaying = true;
-				vidInit = false;
-				ns.resume();
-				videoContainer.dispatchEvent(new MouseEvent(MouseEvent.ROLL_OUT));	
-			}
-			
-			
-			//currentBytesLoaded array value is populated when the NetStream.Buffer.Empty event is triggered
-			//then the Buffer value is added to the currentBytesLoaded array value to mark where the video 
-			//should resume play
-			if(currentBytesLoaded[0] > 0){
-				//if bufferLoaded is over 99% and the video is currently not playing(buffering) the it will play
-				//or if the video had compeltely loded
-				if (bufferLoaded > 99  && !vidPlaying || videoLoadedPercent == 100){
-					currentBytesLoaded[0] = 0;					
+				if (videoLoadedPercent > pecentStartPlaying && !vidPlaying  && vidInit){
+					trace("resumed");
+					//removeEventListener(Event.ENTER_FRAME, onEnterFrame);
 					vidPlaying = true;
+					vidInit = false;
 					ns.resume();
 					videoContainer.dispatchEvent(new MouseEvent(MouseEvent.ROLL_OUT));	
-					statusMessage = "Buffering Complete";
-					
-				}			
-			}
+				}
+				
+				
+				//currentBytesLoaded array value is populated when the NetStream.Buffer.Empty event is triggered
+				//then the Buffer value is added to the currentBytesLoaded array value to mark where the video 
+				//should resume play
+				if(currentBytesLoaded[0] > 0){
+					//if bufferLoaded is over 99% and the video is currently not playing(buffering) the it will play
+					//or if the video had compeltely loded
+					if (bufferLoaded > 99  && !vidPlaying || videoLoadedPercent == 100){
+						currentBytesLoaded[0] = 0;					
+						vidPlaying = true;
+						ns.resume();
+						videoContainer.dispatchEvent(new MouseEvent(MouseEvent.ROLL_OUT));	
+						statusMessage = "Buffering Complete";
+						
+					}			
+				}
 			
-		}
-		
-		
+		}		
 		
 		
 	}//end Class

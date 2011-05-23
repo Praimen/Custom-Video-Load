@@ -1,4 +1,4 @@
-package custom
+package avatar
 {
 	import flash.events.EventDispatcher;
 	

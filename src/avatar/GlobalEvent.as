@@ -1,12 +1,12 @@
-package custom
+package avatar
 {
 	import flash.events.Event;
 	
 	public class GlobalEvent extends Event
 	{	
 		// event constants		
-		public static const FONT_LOADED:String = "fontLoaded";	
-		public static const TEXT_READY:String = "textReady";		
+		public static const XML_LOADED:String = "xml Loaded";
+		public static const FLASHVARS_LOADED:String = "flashvars Loaded";				
 		//public var params:Object;
 	
 		public function GlobalEvent(type:String, /*params:Object,*/ bubbles:Boolean=true, cancelable:Boolean=false)

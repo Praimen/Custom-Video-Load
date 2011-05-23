@@ -1,5 +1,5 @@
 package avatar { 
-	//import flash.display.*;
+	
 	import flash.text.*;
 	
 	public class EmbedFonts { 
@@ -17,11 +17,9 @@ package avatar {
 						 
 		}
 		
-		public function get format():TextFormat{
-			
+		public function get format():TextFormat{			
 			return _textFormat;
-		}
-		
+		}		
 		
 	} //end Class
 }//End Package
